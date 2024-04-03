@@ -1,0 +1,23 @@
+services:
+  mongo6:
+    build:
+      context: ./mongoDB
+      args:
+        MONGO_VERSION: ${MONGO_VERSION}
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
+      MONGO_REPLICA_HOST: 127.0.0.1
+      MONGO_REPLICA_PORT: 27019
+      # Use "mongo" instead of "mongosh" before v5.0
+      MONGO_COMMAND: ${MONGO_COMMAND}
+    ports:
+      - '${MONGO_PORT}:27019'
+    restart: unless-stopped
+    healthcheck:
+      # Use "mongo" instead of "mongosh" before v5.0
+      test: ['CMD', 'mongosh', 'admin', '--port', '27019', '--eval', "db.adminCommand('ping').ok"]
+      interval: 5s
+      timeout: 2s
+      retries: 20
