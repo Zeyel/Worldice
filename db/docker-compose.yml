@@ -1,42 +1,21 @@
-services:
-  primary:
-    image: mongo:latest
-    container_name: primary_mongo
-    ports:
-      - "27017:27017"
-    volumes:
-      - primary_data:/data/db
-    command: mongod --replSet rs0 --bind_ip 0.0.0.0
-    networks:
-      - mongo-net
-
-  secondary1:
-    image: mongo:latest
-    container_name: secondary1_mongo
-    ports:
-      - "27018:27017"
-    volumes:
-      - secondary1_data:/data/db
-    command: mongod --replSet rs0 --bind_ip 0.0.0.0
-    networks:
-      - mongo-net
-
-  secondary2:
-    image: mongo:latest
-    container_name: secondary2_mongo
-    ports:
-      - "27019:27017"
-    volumes:
-      - secondary2_data:/data/db
-    command: mongod --replSet rs0 --bind_ip 0.0.0.0
-    networks:
-      - mongo-net
-
-volumes:
-  primary_data:
-  secondary1_data:
-  secondary2_data:
-
-networks:
-  mongo-net:
-    driver: bridge
+ services:
+  mongo:
+      build:
+        context: .
+        args:
+          MONGO_VERSION: ${MONGO_VERSION}
+      environment:
+        MONGO_USERNAME: ${MONGO_USERNAME}
+        MONGO_PASSWORD: ${MONGO_PASSWORD}
+        MONGO_REPLICA_HOST: localhost
+        MONGO_REPLICA_PORT: 27017
+        MONGO_COMMAND: ${MONGO_COMMAND}
+      ports:
+        - '${MONGO_PORT}:27017'
+      restart: unless-stopped
+      healthcheck:
+        # Use "mongo" instead of "mongosh" before v5.0
+        test: ['CMD', '${MONGO_COMMAND}', 'admin', '--port', '27019', '--eval', "db.adminCommand('ping').ok"]
+        interval: 5s
+        timeout: 2s
+        retries: 20
