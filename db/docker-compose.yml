@@ -15,7 +15,7 @@
       restart: unless-stopped
       healthcheck:
         # Use "mongo" instead of "mongosh" before v5.0
-        test: ['CMD', '${MONGO_COMMAND}', 'admin', '--port', '27019', '--eval', "db.adminCommand('ping').ok"]
+        test: ['CMD', '${MONGO_COMMAND}', '${MONGO_USERNAME}', '--port', '${MONGO_PORT}', '--eval', "db.adminCommand('ping').ok"]
         interval: 5s
         timeout: 2s
         retries: 20
